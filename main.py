@@ -3,98 +3,103 @@ import nltk
 from textblob import TextBlob 
 from newspaper import Article
 
-def summarize():
+def sentiment_analysis(sentimental_txt, article):
+    # Sentiment analysis
+    analysis = TextBlob(article.text)
+    sentimental_txt.delete('1.0','end')
+    sentimental_txt.insert('1.0', f'Polarity: {analysis.polarity}, Sentiment: {"positive" if analysis.polarity > 0 else "negative" if analysis.polarity < 0 else "neutral"}')
+
+def summarize(url_text, title_txt, author_txt, published_txt, summary_txt, sentimental_txt):
 
     nltk.download('punkt')
 
-    # Summarization
-    url = utext.get('1.0', "end").strip()
-    #"https://stackify.com/how-to-optimize-your-python-apps/"
+    # Reading the URL and parsing it
+    url = url_text.get('1.0', "end").strip()
     article = Article(url)
-
     article.download()
     article.parse()
-
     article.nlp()
 
-    title.config(state="normal")
-    author.config(state="normal")
-    publication.config(state="normal")
-    summary.config(state="normal")
-    sentiment.config(state="normal")
+    # Enabling UI to update current text value
+    title_txt.config(state="normal")
+    author_txt.config(state="normal")
+    published_txt.config(state="normal")
+    summary_txt.config(state="normal")
+    sentimental_txt.config(state="normal")
 
-    title.delete('1.0','end')
-    title.insert('1.0', article.title)
+    # Cleaning the text field to insert the new value
+    title_txt.delete('1.0','end')
+    title_txt.insert('1.0', article.title)
 
-    author.delete('1.0','end')
-    author.insert('1.0', article.authors)
+    author_txt.delete('1.0','end')
+    author_txt.insert('1.0', article.authors)
 
-    publication.delete('1.0','end')
-    publication.insert('1.0', article.publish_date)
+    published_txt.delete('1.0','end')
+    published_txt.insert('1.0', article.publish_date)
 
-    summary.delete('1.0','end')
-    summary.insert('1.0', article.summary)
+    summary_txt.delete('1.0','end')
+    summary_txt.insert('1.0', article.summary)
 
-    # Sentiment analysis
-    analysis = TextBlob(article.text)
-    sentiment.delete('1.0','end')
-    sentiment.insert('1.0', f'Polarity: {analysis.polarity}, Sentiment: {"positive" if analysis.polarity > 0 else "negative" if analysis.polarity < 0 else "neutral"}')
+    sentiment_analysis(sentimental_txt, article)
 
-    title.config(state="disable")
-    author.config(state="disable")
-    publication.config(state="disable")
-    summary.config(state="disable")
-    sentiment.config(state="disable")
+    # Disabling text field after showing the results
+    title_txt.config(state="disable")
+    author_txt.config(state="disable")
+    published_txt.config(state="disable")
+    summary_txt.config(state="disable")
+    sentimental_txt.config(state="disable")
 
+def user_interface():
 
-# UI - TK
-root = tk.Tk()
-root.title("News Summarizer")
-root.geometry("1200x600")
+    # UI - TK
+    root = tk.Tk()
+    root.title("News Summarizer")
+    root.geometry("1200x600")
 
-tlabel = tk.Label(root, text="title")
-tlabel.pack()
+    title_label = tk.Label(root, text="Title")
+    title_label.pack()
 
-title = tk.Text(root, height=1, width=140)
-title.config(state='disabled', bg='#dddddd')
-title.pack()
+    title_txt = tk.Text(root, height=1, width=140)
+    title_txt.config(state='disabled', bg='#dddddd')
+    title_txt.pack()
 
-alabel = tk.Label(root, text="author")
-alabel.pack()
+    author_label = tk.Label(root, text="Author")
+    author_label.pack()
 
-author = tk.Text(root, height=1, width=140)
-author.config(state='disabled', bg='#dddddd')
-author.pack()
+    author_txt = tk.Text(root, height=1, width=140)
+    author_txt.config(state='disabled', bg='#dddddd')
+    author_txt.pack()
 
-plabel = tk.Label(root, text="Publishing Date")
-plabel.pack()
+    published_date_label = tk.Label(root, text="Published Date")
+    published_date_label.pack()
 
-publication = tk.Text(root, height=1, width=140)
-publication.config(state='disabled', bg='#dddddd')
-publication.pack()
+    published_txt = tk.Text(root, height=1, width=140)
+    published_txt.config(state='disabled', bg='#dddddd')
+    published_txt.pack()
 
-slabel = tk.Label(root, text="Summary")
-slabel.pack()
+    summary_label = tk.Label(root, text="Summary")
+    summary_label.pack()
 
-summary = tk.Text(root, height=20, width=140)
-summary.config(state='disabled', bg='#dddddd')
-summary.pack()
+    summary_txt = tk.Text(root, height=20, width=140)
+    summary_txt.config(state='disabled', bg='#dddddd')
+    summary_txt.pack()
 
-selabel = tk.Label(root, text="Sentimental Analysis")
-selabel.pack()
+    sentimental_label = tk.Label(root, text="Sentimental Analysis")
+    sentimental_label.pack()
 
-sentiment = tk.Text(root, height=1, width=140)
-sentiment.config(state='disabled', bg='#dddddd')
-sentiment.pack()
+    sentimental_txt = tk.Text(root, height=1, width=140)
+    sentimental_txt.config(state='disabled', bg='#dddddd')
+    sentimental_txt.pack()
 
-ulabel = tk.Label(root, text="URL")
-ulabel.pack()
+    url_label = tk.Label(root, text="URL")
+    url_label.pack()
 
-utext = tk.Text(root, height=1, width=140)
-utext.pack()
+    url_text = tk.Text(root, height=1, width=140)
+    url_text.pack()
 
-btn = tk.Button(root, text="Summarize", command=summarize)
-btn.pack()
+    btn = tk.Button(root, text="Summarize", command= lambda: summarize(url_text, title_txt, author_txt, published_txt, summary_txt, sentimental_txt))
+    btn.pack()
 
-root.mainloop()
+    root.mainloop()
 
+user_interface()
